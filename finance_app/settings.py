@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'djoser',
     'playground',
     'cashflow',
-    'debug_toolbar'
+    'debug_toolbar',
+    'core',
 ]
 
 MIDDLEWARE = [
