@@ -1,0 +1,6 @@
+{
+    "python.pipenvPath": "~/.local/share/virtualenvs/finance_app2-JouVi7Fg/bin/python",
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "editor.formatOnSave": true
+  
+}
