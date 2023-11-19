@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 CASHFLOW_TYPE_CHOICES = [
     ('income_fixed', 'Inkomen vast'),
@@ -34,12 +35,13 @@ class CashflowType(models.Model):
 
 class Cashflow(models.Model):
     id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     cashflow_amount = models.DecimalField(max_digits=100, decimal_places=2)
     cashflow_payment_term = models.CharField(max_length=255, null=True)
     cashflow_valid_from = models.DateField()
     cashflow_valid_up_including = models.DateField(null=True)
     cashflow_description = models.TextField(null=True)
-    cashflow_category_id = models.CharField(max_length=30)
+    cashflow_category_id = models.CharField(max_length=30, null=True)
     cashflow_type = models.ForeignKey(CashflowType, on_delete=models.PROTECT)
     cashflow_last_update = models.DateTimeField(auto_now=True)
 
