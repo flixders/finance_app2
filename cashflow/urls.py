@@ -3,12 +3,16 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register('cashflow', views.CashflowViewSet, basename='cashflow')
+router.register('transaction-planned', views.TransactionPlannedViewSet,
+                basename='transaction-planned')
+router.register('transaction-variable', views.TransactionVariableViewSet,
+                basename='transaction-variable')
+router.register('bank-account', views.BankAccountViewSet,
+                basename='bank-account')
 
 urlpatterns = [
-    path('cashflow-type/', views.CashflowTypeList.as_view(),
-         name='cashflow_type_list'),
-
+    path('transaction-types/', views.TransactionTypeList.as_view(),
+         name='transaction-type-list')
 ]
 
 urlpatterns += router.urls
