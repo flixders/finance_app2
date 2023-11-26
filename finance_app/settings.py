@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework',
     'djoser',
-    'playground',
     'cashflow',
     'debug_toolbar',
     'core',
