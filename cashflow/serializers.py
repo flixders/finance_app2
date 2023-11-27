@@ -1,6 +1,12 @@
 from decimal import Decimal
 from rest_framework import serializers
-from .models import TransactionType, TransactionPlanned, TransactionVariable, BankAccount
+from .models import TransactionType, TransactionPlanned, TransactionVariable, BankAccount, TransactionCategory
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransactionCategory
+        fields = ['name', 'description']
 
 
 class BankAccountSerializer(serializers.ModelSerializer):
@@ -21,7 +27,7 @@ class TransactionPlannedSerializer(serializers.ModelSerializer):
         model = TransactionPlanned
         fields = ['id', 'amount',
                   'payment_term', 'date_valid_from',
-                  'date_valid_up_including', 'description',
+                  'date_valid_up_including', 'category', 'description',
                   'transaction_type']
 
 
@@ -29,5 +35,5 @@ class TransactionVariableSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransactionVariable
         fields = ['id', 'amount',
-                  'date', 'description',
+                  'date', 'category', 'description',
                   'transaction_type']

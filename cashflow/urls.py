@@ -12,7 +12,9 @@ router.register('bank-account', views.BankAccountViewSet,
 
 urlpatterns = [
     path('transaction-types/', views.TransactionTypeList.as_view(),
-         name='transaction-type-list')
+         name='transaction-type-list'),
+    path('calculations/transactions/<str:start_date>/<str:end_date>/',
+         views.CalculationTransactionsView.as_view(), name='calculation_transactions'),
 ]
 
 urlpatterns += router.urls
