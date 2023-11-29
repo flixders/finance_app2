@@ -90,7 +90,7 @@ WSGI_APPLICATION = 'finance_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'finance_app_6',
+        'NAME': 'finance_app_7',
         'USER': 'postgres',
         'PASSWORD': 'new_password',
         'HOST': 'localhost',  # or your specific host
