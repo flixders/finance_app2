@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from .constants import payment_term_multipliers
+from datetime import date
 
 
 class TransactionCategory(models.Model):
