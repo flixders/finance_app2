@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from cashflow.pagination import DefaultPagination
-from cashflow.models import TransactionType, TransactionPlanned, TransactionVariable, BankAccount, TransactionCategory
-from cashflow.serializers import TransactionTypeSerializer, TransactionPlannedSerializer, TransactionVariableSerializer, BankAccountSerializer, TransactionCategorySerializer
+from cashflow.models import TransactionPlanned, TransactionVariable, BankAccount, TransactionCategory, TransactionPaymentTerm
+from cashflow.serializers import TransactionPlannedSerializer, TransactionVariableSerializer, BankAccountSerializer, TransactionCategorySerializer, TransactionPaymentTermSerializer
 from .calculations import calculate_budget
 import pandas as pd
 from json import loads
@@ -20,7 +20,7 @@ class BankAccountViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     # filterset_class = CashflowFilter
     search_fields = ['description']
-    ordering_fields = ['id', 'amount']
+    ordering_fields = ['id']
     pagination_class = DefaultPagination
     permission_classes = [IsAuthenticated]
 
@@ -99,14 +99,14 @@ class TransactionVariableViewSet(ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
 
-class TransactionTypeList(ListAPIView):
-    queryset = TransactionType.objects.all()
-    serializer_class = TransactionTypeSerializer
-
-
 class TransactionCategoryList(ListAPIView):
     queryset = TransactionCategory.objects.all()
     serializer_class = TransactionCategorySerializer
+
+
+class TransactionPaymentTermList(ListAPIView):
+    queryset = TransactionPaymentTerm.objects.all()
+    serializer_class = TransactionPaymentTermSerializer
 
 
 class CalculationBudgetOverviewView(ListAPIView):
@@ -127,11 +127,9 @@ class CalculationBudgetOverviewView(ListAPIView):
                 user=user)
 
         transaction_types = [
-            'income_planned',
-            'income_variable',
-            'spending_planned',
-            'spending_variable_planned',
-            'spending_variable_unplanned'
+            'variable_spending',
+            'fixed_income',
+            'fixed_spending'
         ]
         default_values = {
             'transaction_type_name': transaction_types,
@@ -160,7 +158,7 @@ class CalculationBudgetOverviewIntervalView(ListAPIView):
         date_range = pd.date_range(
             start=start_date, end=end_date, freq=resampling_freq)
 
-        # Iterate through the date range intervals and calculate budget for each interval
+        # Iterate through the date range intervals and calculate budget for each interval (still buggy )
         for start, stop in zip(date_range[:-1], date_range[1:]):
             result_for_interval = calculate_budget(
                 start_date=start,

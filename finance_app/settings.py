@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'cashflow',
     'debug_toolbar',
     'core',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -55,11 +56,24 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_HEADERS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]
 
 INTERNAL_IPS = [
     # ...
-    "127.0.0.1",
+    "http://localhost:8000",
+    "http://localhost:5173"
     # ...
 ]
 
@@ -90,7 +104,7 @@ WSGI_APPLICATION = 'finance_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'finance_app_7',
+        'NAME': 'finance_app_11',
         'USER': 'postgres',
         'PASSWORD': 'new_password',
         'HOST': 'localhost',  # or your specific host

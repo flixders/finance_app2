@@ -10,30 +10,36 @@ def calculate_budget(start_date, end_date, TransactionVariable, TransactionPlann
     queryset_variable = TransactionVariable.objects.filter(
         user=user,
         date__range=(start_date.date(), end_date.date())
-    ).select_related('transaction_type')
+    )
 
     queryset_fixed = TransactionPlanned.objects.filter(
         user=user,
         date_valid_up_including__gte=start_date.date()
-    ).select_related('transaction_type')
+    )
 
     data_variable = list(queryset_variable.values(
         'amount',
-        'date',
-        transaction_type_name=F('transaction_type__transaction_type_name')))
+        'date'))
     df_variable = pd.DataFrame(data_variable)
+
+    def assign_transaction_type(amount):
+        if amount > 0:
+            return 'variable_income'
+        else:
+            return 'variable_spending'
+    df_variable['transaction_type_name'] = df_variable['amount'].apply(
+        lambda x: assign_transaction_type(x))
 
     data_fixed = list(queryset_fixed.values(
         'amount',
-        'payment_term',
         'date_valid_from',
         'date_valid_up_including',
-        transaction_type_name=F('transaction_type__transaction_type_name')))
+        payment_term_name=F('payment_term__payment_term_name')))
     df_fixed = pd.DataFrame(data_fixed)
 
     df_fixed['yearly_amount'] = df_fixed.apply(
         lambda row: row['amount'] *
-        payment_term_multipliers.get(row['payment_term'], pd.NA),
+        payment_term_multipliers.get(row['payment_term_name'], pd.NA),
         axis=1
     )
     df_fixed['amount'] = df_fixed['yearly_amount'] / 365
@@ -44,6 +50,10 @@ def calculate_budget(start_date, end_date, TransactionVariable, TransactionPlann
     df_fixed['date_valid_up_including'] = pd.to_datetime(
         df_fixed['date_valid_up_including'])
 
+    df_fixed['transaction_type_name'] = df_fixed['amount'].apply(
+        lambda x: 'fixed_income' if x > 0 else 'fixed_spending'
+    )
+
     df_fixed['date'] = df_fixed.apply(
         lambda row: pd.date_range(
             start=row['date_valid_from'],
@@ -52,9 +62,9 @@ def calculate_budget(start_date, end_date, TransactionVariable, TransactionPlann
         axis=1
     )
     df_fixed = df_fixed[[
-        'transaction_type_name',
         'amount',
-        'date']]
+        'date',
+        'transaction_type_name']]
     df_fixed = df_fixed.explode('date')
     result_df = \
         pd.concat(
@@ -77,6 +87,18 @@ def calculate_budget(start_date, end_date, TransactionVariable, TransactionPlann
         'transaction_type_name': 'available_budget',
         'amount': result_total
     }])
+    transaction_type_mapping = {
+        'fixed_income': 'Inkomen vast',
+        'fixed_spending': 'Uitgaven vast',
+        'variable_spending': 'Uitgaven variabel',
+        'variable_income': 'Inkomen variabel',
+        'available_budget': 'Beschikbaar budget',
+    }
+
     result_df = pd.concat(
         [result_df, available_budget_row], ignore_index=True)
+
+    result_df['transaction_type_title'] = result_df['transaction_type_name'].map(
+        transaction_type_mapping)
+    result_df
     return (result_df)
