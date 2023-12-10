@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import BankAccountViewSet, TransactionPlannedViewSet, TransactionVariableViewSet, TransactionCategoryList, TransactionPaymentTermList, CalculationBudgetOverviewView, CalculationBudgetOverviewIntervalView, CalculationSpendingVariableView, CalculationSpendingVariableIntervalView
+from .views import BankAccountViewSet, TransactionPlannedViewSet, TransactionVariableViewSet, TransactionCategoryList, TransactionPaymentTermList, CalculationBudgetOverviewView, CalculationBudgetOverviewIntervalView, CalculationSpendingVariableView
 
 router = DefaultRouter()
 router.register(r'bank-account', BankAccountViewSet, basename='bank-account')
@@ -17,10 +17,8 @@ urlpatterns = [
          name='transaction-category-list'),
     path('calculations/budget-overview/<str:start_date>/<str:end_date>/',
          CalculationBudgetOverviewView.as_view(), name='calculate-budget-overview'),
-    path('calculations/budget-interval/<str:start_date>/<str:end_date>/<int:interval>',
+    path('calculations/budget-interval/<str:end_date>/<int:interval>',
          CalculationBudgetOverviewIntervalView.as_view(), name='calculate-budget-overview'),
     path('calculations/spending-variable/<str:start_date>/<str:end_date>/',
          CalculationSpendingVariableView.as_view(), name='calculate-spending-variable'),
-    path('calculations/spending-variable-interval/<str:start_date>/<str:end_date>/<int:interval>',
-         CalculationSpendingVariableIntervalView.as_view(), name='calculate-spending-variable'),
 ]

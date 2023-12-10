@@ -13,6 +13,7 @@ from cashflow.serializers import TransactionPlannedSerializer, TransactionVariab
 from .calculations import calculate_budget
 import pandas as pd
 from json import loads
+import json
 
 
 class BankAccountViewSet(ModelViewSet):
@@ -149,11 +150,14 @@ class CalculationBudgetOverviewIntervalView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         user = self.request.user
-        start_date = self.kwargs['start_date']
         end_date = self.kwargs['end_date']
         interval = self.kwargs['interval']
 
-        results = []
+        end_date = pd.to_datetime(end_date).date()
+        start_date = end_date - pd.Timedelta(days=10 * interval)
+        start_date = pd.to_datetime(start_date).date()
+        results = pd.DataFrame(
+            columns=['transaction_type_name', 'amount', 'transaction_type_title', 'date'])
         resampling_freq = f"{interval}D"
         date_range = pd.date_range(
             start=start_date, end=end_date, freq=resampling_freq)
@@ -166,14 +170,9 @@ class CalculationBudgetOverviewIntervalView(ListAPIView):
                 TransactionVariable=TransactionVariable,
                 TransactionPlanned=TransactionPlanned,
                 user=user)
-            result_for_interval = \
-                result_for_interval[result_for_interval['transaction_type_name']
-                                    == 'available_budget']
-            amount_for_interval = result_for_interval['amount'].values[
-                0] if not result_for_interval.empty else None
-            results.append(
-                {'date': start,
-                 'available_budget': amount_for_interval})
+            result_for_interval['date'] = start
+            results = pd.concat(
+                [results, result_for_interval], ignore_index=True)
 
         df_result = pd.DataFrame(results)
         df_result['date'] = pd.to_datetime(
@@ -205,38 +204,5 @@ class CalculationSpendingVariableView(ListAPIView):
         df_variable = pd.DataFrame(data_variable)
         result_df = df_variable.groupby('category_name')[
             'amount'].sum().reset_index()
-        result_df = loads(result_df.to_json(orient="records"))
-        return Response(result_df)
-
-
-class CalculationSpendingVariableIntervalView(ListAPIView):
-    def queryset(self):
-        return TransactionVariable.objects.none()  # Return an empty queryset
-
-    def get(self, request, *args, **kwargs):
-        user = self.request.user
-        start_date = self.kwargs['start_date']
-        end_date = self.kwargs['end_date']
-        interval = self.kwargs['interval']
-        start_date = pd.to_datetime(start_date).date()
-        end_date = pd.to_datetime(end_date).date()
-
-        queryset_variable = TransactionVariable.objects.filter(
-            user=user,
-            date__range=(start_date, end_date)
-        ).select_related('transaction_type')
-        data_variable = list(queryset_variable.values(
-            'amount',
-            'date'))
-        df_variable = pd.DataFrame(data_variable)
-        df_variable['date'] = pd.to_datetime(df_variable['date'])
-        df_variable.drop_duplicates(subset='date', keep='first', inplace=True)
-        df_variable.set_index('date', inplace=True)
-        date_range = pd.date_range(start=start_date, end=end_date, freq='D')
-        df_variable = df_variable.reindex(date_range, fill_value=0)
-        resampling_freq = f"{interval}D"
-        summarized_df = df_variable['amount'].resample(resampling_freq).sum()
-        summarized_df.index = summarized_df.index.strftime('%Y-%m-%d')
-        result_df = summarized_df.reset_index()
         result_df = loads(result_df.to_json(orient="records"))
         return Response(result_df)
