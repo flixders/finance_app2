@@ -154,7 +154,7 @@ class CalculationBudgetOverviewIntervalView(ListAPIView):
         interval = self.kwargs['interval']
 
         end_date = pd.to_datetime(end_date).date()
-        start_date = end_date - pd.Timedelta(days=10 * interval)
+        start_date = end_date - pd.Timedelta(days=5 * (interval))
         start_date = pd.to_datetime(start_date).date()
         results = pd.DataFrame(
             columns=['transaction_type_name', 'amount', 'transaction_type_title', 'date'])
@@ -165,12 +165,12 @@ class CalculationBudgetOverviewIntervalView(ListAPIView):
         # Iterate through the date range intervals and calculate budget for each interval (still buggy )
         for start, stop in zip(date_range[:-1], date_range[1:]):
             result_for_interval = calculate_budget(
-                start_date=start,
+                start_date=start + pd.Timedelta(days=1),
                 end_date=stop,
                 TransactionVariable=TransactionVariable,
                 TransactionPlanned=TransactionPlanned,
                 user=user)
-            result_for_interval['date'] = start
+            result_for_interval['date'] = start + pd.Timedelta(days=1)
             results = pd.concat(
                 [results, result_for_interval], ignore_index=True)
 
