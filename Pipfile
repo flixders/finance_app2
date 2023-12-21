@@ -12,6 +12,9 @@ dj-database-url = "*"
 djoser = "*"
 django-debug-toolbar = "*"
 django-cors-headers = "*"
+pip = "*"
+install = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
