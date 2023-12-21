@@ -10,6 +10,7 @@ django-filter = "*"
 gunicorn = "*"
 dj-database-url = "*"
 djoser = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 
