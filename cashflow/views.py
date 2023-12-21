@@ -101,16 +101,20 @@ class TransactionVariableViewSet(ModelViewSet):
 
 
 class TransactionCategoryList(ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = TransactionCategory.objects.all()
     serializer_class = TransactionCategorySerializer
 
 
 class TransactionPaymentTermList(ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = TransactionPaymentTerm.objects.all()
     serializer_class = TransactionPaymentTermSerializer
 
 
 class CalculationBudgetOverviewView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
     def queryset(self):
         return TransactionVariable.objects.none()  # Return an empty queryset
 
@@ -145,6 +149,8 @@ class CalculationBudgetOverviewView(ListAPIView):
 
 
 class CalculationBudgetOverviewIntervalView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
     def queryset(self):
         return TransactionVariable.objects.none()  # Return an empty queryset
 
@@ -182,6 +188,8 @@ class CalculationBudgetOverviewIntervalView(ListAPIView):
 
 
 class CalculationSpendingVariableView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
     def queryset(self):
         return TransactionVariable.objects.none()  # Return an empty queryset
 

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from .constants import payment_term_multipliers
 from django.db.models import F
 
@@ -44,14 +45,15 @@ def calculate_budget(start_date, end_date, TransactionVariable, TransactionPlann
             payment_term_multipliers.get(row['payment_term_name'], pd.NA),
             axis=1
         )
+
         df_fixed['amount'] = df_fixed['yearly_amount'] / 365
-        # add ifelse condition when valid_from is later than startdate
-        df_fixed['date_valid_from'] = start_date
+        df_fixed['date_valid_from'] = np.where(
+            df_fixed['date_valid_from'] <= start_date.date(), start_date.date(), df_fixed['date_valid_from'])
         df_fixed['date_valid_from'] = pd.to_datetime(
             df_fixed['date_valid_from'])
 
-        # add ifelse condition when date_valid_up_including is earlier than enddate
-        df_fixed['date_valid_up_including'] = end_date
+        df_fixed['date_valid_up_including'] = np.where(
+            df_fixed['date_valid_up_including'] >= end_date.date(), end_date.date(), df_fixed['date_valid_up_including'])
         df_fixed['date_valid_up_including'] = pd.to_datetime(
             df_fixed['date_valid_up_including'])
 
