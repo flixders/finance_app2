@@ -9,6 +9,7 @@ djangorestframework = "*"
 django-filter = "*"
 gunicorn = "*"
 dj-database-url = "*"
+djoser = "*"
 
 [dev-packages]
 
