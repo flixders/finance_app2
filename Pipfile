@@ -11,6 +11,7 @@ gunicorn = "*"
 dj-database-url = "*"
 djoser = "*"
 django-debug-toolbar = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 
